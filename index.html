@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>restaurant app</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div>
+        <label >order:</label>
+        <input type="text"  id="order-inp">
+        <label >price:</label>
+        <input type="number"  id="price-inp">
+        <button onclick="render()">take order</button>
+    </div>
+    <div id="mainArea">
+
+    </div>
+
+
+    <script>
+        function getData(){
+            axios.get('http://localhost:3000/rest/orders')
+            .then((response)=>{
+                const ordArr = response.data.orders;
+                const grandParent = document.getElementById('mainArea');
+                for(let i = 0; i < ordArr.length; i++){
+                    const parent = document.createElement('div');
+                    const child1 = document.createElement('span');
+                    child1.innerHTML = `order: ${ordArr[i].order}  `
+                    const child2 = document.createElement('span');
+                    child2.innerHTML = `price: ${ordArr[i].price}  `
+                    const child3 = document.createElement('button');
+                    child3.innerHTML = 'delete';
+                    parent.appendChild(child1);
+                    parent.appendChild(child2);
+                    parent.appendChild(child3);
+                    child3.addEventListener('click',()=>{
+                        deleteOrder(ordArr[i].orderId);
+                        parent.remove();
+                    })
+
+                    grandParent.appendChild(parent);
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        }
+
+        getData();
+
+        function render(){
+            const parentEl = document.getElementById('mainArea');
+            const order = document.getElementById('order-inp').value;
+            const price = document.getElementById('price-inp').value;
+
+            const data = {
+                order : order,
+                price : price
+            }
+
+            axios.post('http://localhost:3000/rest/orders',data)
+            .then((response)=>{
+                const orderVal = response.data.order;
+                const priceval = response.data.price;
+                
+                const childEl1 = document.createElement('span');
+                childEl1.innerHTML = `order: ${orderVal}  `
+                const childEl12 = document.createElement('span');
+                childEl12.innerHTML = `price : ${priceval}  `
+                const parentEl2 = document.createElement('div');
+                parentEl2.appendChild(childEl1);
+                parentEl2.appendChild(childEl12);
+
+                const childEl3 = document.createElement('button');
+                childEl3.innerHTML = 'delete';
+                parentEl2.appendChild(childEl3)
+                parentEl.appendChild(parentEl2);
+                childEl3.addEventListener('click',()=>{
+                    deleteOrder(response.data.orderId);
+                    parentEl2.remove()
+                })
+
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        }
+
+        function deleteOrder(orderId){
+            axios.delete(`http://localhost:3000/rest/orders/${orderId}`)
+            .then((res)=>{
+                console.log('order deleted successfully');
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        }
+    </script>
+</body>
+</html>

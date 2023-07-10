@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const app = express();
 
 app.use(bodyParser.json());
@@ -79,7 +80,9 @@ app.delete('/rest/orders/:orderId',(req,res)=>{
 
 
 
-
+app.use('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
 
 app.listen(3000,()=>{
     console.log('listening to 3000');
