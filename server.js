@@ -48,6 +48,34 @@ app.post('/rest/orders',(req,res)=>{
     })
 });
 
+app.get('/rest/orders',(req,res)=>{
+    fs.readFile('resdata.json','utf-8',(err,data)=>{
+        if(err){
+            return res.sendStatus(404)
+        }
+        const orders = JSON.parse(data);
+        return res.json({orders: orders});
+    })
+});
+
+app.delete('/rest/orders/:orderId',(req,res)=>{
+    fs.readFile('resdata.json','utf-8',(err,data)=>{
+        if(err){
+            return res.sendStatus(403)
+        }
+        const orders = JSON.parse(data);
+        const index = oderIndex(orders,parseInt(req.params.orderId));
+        if(index !== -1){
+            orders.splice(index,1);
+            fs.writeFile('resdata.json',JSON.stringify(orders),(err)=>{
+                if(err){
+                    return res.sendStatus(403);
+                }
+                res.json({message: "order deleted successfully"});
+            })
+        }
+    })
+});
 
 
 
